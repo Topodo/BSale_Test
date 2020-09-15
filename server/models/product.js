@@ -28,6 +28,19 @@ Product.findAll = result => {
     })
 }
 
+// GET que obtiene un producto en específico
+Product.findById = (id, result) => {
+    mysql.query(`SELECT * FROM product WHERE id = ${id} LIMIT 1`, (error, product) => {
+        // Control de errores
+        if (error) {
+            console.error(error);
+            result(null, error);
+        } else {
+            result(null, product);
+        }
+    })
+}
+
 // GET que obtiene los productos específicos de una categoría
 Product.findByCategory = (category, result) => {
     mysql.query(`SELECT * FROM product WHERE category = ${category}`, (error, products) => {
@@ -36,7 +49,6 @@ Product.findByCategory = (category, result) => {
             console.error(error);
             result(null, error);
         } else {
-            console.log(products);
             result(null, products);
         }
     })

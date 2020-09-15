@@ -8,9 +8,22 @@ const product = require('../models/product');
 // Servicio REST que obtiene todos los productos
 exports.findAll = (request, response) => {
     product.findAll((error, data) => {
-        if (error) 
+        if (error)
             response.status(500).send({ message: error.message || "Ocurrió un error de conexión." });
-        else 
+        else
+            response.send(data);
+    });
+}
+
+// Servicio REST que obtiene un producto específico
+exports.findById = (request, response) => {
+    product.findById(request.params.id, (error, data) => {
+        if (error)
+            if (error.kind === "not_found")
+                response.status(404).send({ message: error.message || "Producto no encontrado." })
+            else
+                response.status(500).send({ message: error.message || "Ocurrió un error de conexión." });
+        else
             response.send(data);
     });
 }
@@ -21,7 +34,7 @@ exports.findByCategory = (request, response) => {
         if (error) {
             if (error.kind === "not_found")
                 response.status(404).send({ message: error.message || "Categoría no encontrada." })
-            else 
+            else
                 response.status(500).send({ message: error.message || "Ocurrió un error de conexión." });
         } else {
             response.send(data)

@@ -4,6 +4,8 @@ module.exports = app => {
     const productController = require('../controllers/productController');
     // GET que obtiene todos los productos
     app.get('/api/products', productController.findAll);
+    // GET que obtiene un producto específico
+    app.get('/api/products/:id', productController.findById);
     // GET que obtiene los productos de una categoría específica
     app.get('/api/products/:category', productController.findByCategory)
 };
