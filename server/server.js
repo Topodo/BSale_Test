@@ -14,6 +14,13 @@ const categoryRoutes = require('./routes/categoryRoutes');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+// Se activa el control de acceso CORS
+app.use((request, response, next) => {
+    response.header('Access-Control-Allow-Origin', '*');
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+})
+
 // GET de verificación de conexión al servidor
 app.get("/status", (request, response) => {
     response.json({

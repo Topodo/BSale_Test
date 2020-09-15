@@ -7,29 +7,64 @@ const mysql = require('mysql');
 const config = require('./config/db.config');
 
 // Se establece la conexión a la base de datos
-var connection = null;
+var connection = mysql.createPool({
+    host: config.HOST,
+    user: config.USER,
+    password: config.PASSWORD,
+    database: config.DB
+});
 
-const handleConnection = () => {
-    // Se verifica que no exista una conexión a MySQL ejecutándose
-    if (connection) connection.releaseConnection();
+connection.getConnection(error => {
+    if (error) {
+        console.log("\n\t *** Cannot establish a connection with the database. ***");
+        connection = reconnect(connection);
+    } else {
+        console.log("\n\t *** New connection established with the database. ***")
+    }
+});
 
-    connection = mysql.createPool({
-        host: config.HOST,
-        user: config.USER,
-        password: config.PASSWORD,
-        database: config.DB
-    });
+// Función encargada de reconectar con la base de datos
+function reconnect(connection) {
 
-    // Se manejan los errores de desconexión desde el servidor MySQL
-    connection.on('error', error => {
-        console.error('DB error', error.code);
-        if (error.code === 'PROTOCOL_CONNECTION_LOST') {
-            handleConnection();
-        } else if (error.code === 'PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR') {
-            handleConnection();
+    connection = mysql.createPool(db_config);
+
+    connection.getConnection(error => {
+        if (error) {
+            setTimeout(reconnect(connection), 1000);
+        } else {
+            console.log("\n\t *** New connection established with the database. ***")
+            return connection;
         }
-    })
+    });
 }
 
-handleConnection();
+// Manejador de errores de conexión
+connection.on('error', error => {
+
+    if (error.code === "PROTOCOL_CONNECTION_LOST") {
+        console.log("/!\\ Cannot establish a connection with the database. /!\\ (" + error.code + ")");
+        return reconnect(connection);
+    }
+
+    else if (error.code === "PROTOCOL_ENQUEUE_AFTER_QUIT") {
+        console.log("/!\\ Cannot establish a connection with the database. /!\\ (" + error.code + ")");
+        return reconnect(connection);
+    }
+
+    else if (error.code === "PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR") {
+        console.log("/!\\ Cannot establish a connection with the database. /!\\ (" + error.code + ")");
+        return reconnect(connection);
+    }
+
+    else if (error.code === "PROTOCOL_ENQUEUE_HANDSHAKE_TWICE") {
+        console.log("/!\\ Cannot establish a connection with the database. /!\\ (" + error.code + ")");
+    }
+
+    else {
+        console.log("/!\\ Cannot establish a connection with the database. /!\\ (" + error.code + ")");
+        return reconnect(connection);
+    }
+
+});
+
 module.exports = connection;
