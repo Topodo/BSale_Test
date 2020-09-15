@@ -17,7 +17,7 @@ app.use(bodyParser.json());
 // Se activa el control de acceso CORS
 app.use((request, response, next) => {
     response.header('Access-Control-Allow-Origin', '*');
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 })
 

@@ -7,12 +7,13 @@ const mysql = require('mysql');
 const config = require('./config/db.config');
 
 // Se establece la conexión a la base de datos
-var connection = mysql.createPool({
+var db_config = {
     host: config.HOST,
     user: config.USER,
     password: config.PASSWORD,
     database: config.DB
-});
+}
+var connection = mysql.createPool(db_config);
 
 connection.getConnection(error => {
     if (error) {
